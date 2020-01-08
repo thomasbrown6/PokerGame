@@ -7,20 +7,15 @@ using static Poker.Models.Card;
 
 namespace Poker
 {
-    public enum Hand
-    {
-        StraightFlush,
-        ThreeOfAKind,
-        Straight,
-        Flush,
-        Pair,
-        HighCard
-    }
-
-    public struct HandValue
-    {
-        public int Total { get; set; }
-    }
+    //public enum Hand
+    //{
+    //    StraightFlush,
+    //    ThreeOfAKind,
+    //    Straight,
+    //    Flush,
+    //    Pair,
+    //    HighCard
+    //}
 
     class HandEvaluator
     {
