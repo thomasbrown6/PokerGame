@@ -73,9 +73,14 @@ namespace Poker
                 }
             }
 
-            if (straightFlushPlayers != null && straightFlushPlayers.Count > 1)
+            if (straightFlushPlayers.Count > 1)
             {
                 straightFlushPlayers = HighCard(straightFlushPlayers);
+            }
+
+            if (straightFlushPlayers.Count > 0)
+            {
+                straightFlushPlayers[0].handType = EHandType.StraightFlush;
             }
 
             return straightFlushPlayers;
@@ -94,9 +99,14 @@ namespace Poker
                 }
             }
 
-            if (threeOfAKindPlayers != null && threeOfAKindPlayers.Count > 1)
+            if (threeOfAKindPlayers.Count > 1)
             {
                 threeOfAKindPlayers = HighCard(threeOfAKindPlayers);
+            }
+
+            if (threeOfAKindPlayers.Count > 0)
+            {
+                threeOfAKindPlayers[0].handType = EHandType.ThreeOfAKind;
             }
 
             return threeOfAKindPlayers;
@@ -114,9 +124,14 @@ namespace Poker
                 }
             }
 
-            if (straightPlayers != null && straightPlayers.Count > 1)
+            if (straightPlayers.Count > 1)
             {
                 straightPlayers = HighCard(straightPlayers);
+            }
+
+            if (straightPlayers.Count > 0)
+            {
+                straightPlayers[0].handType = EHandType.Straight;
             }
 
             return straightPlayers;
@@ -134,9 +149,14 @@ namespace Poker
                 }
             }
 
-            if (flushPlayers != null && flushPlayers.Count > 1)
+            if (flushPlayers.Count > 1)
             {
                 flushPlayers = HighCard(flushPlayers);
+            }
+
+            if (flushPlayers.Count > 0)
+            {
+                flushPlayers[0].handType = EHandType.Flush;
             }
 
             return flushPlayers;
@@ -168,9 +188,19 @@ namespace Poker
                 }
             }
 
-            if (pairPlayers != null && pairPlayers.Count > 1)
+            if (pairPlayers.Count > 1)
             {
                 pairPlayers = HighPair(pairPlayers);
+            }
+
+            if (pairPlayers.Count > 1)
+            {
+                pairPlayers = RemainingCard(pairPlayers);
+            }
+
+            if (pairPlayers.Count > 0)
+            {
+                pairPlayers[0].handType = EHandType.Pair;
             }
 
             return pairPlayers;
@@ -185,20 +215,20 @@ namespace Poker
             {
                 highCardPlayers = GetPlayersWithValue(players, i, 0);
 
-                if (highCardPlayers != null)
+                if (highCardPlayers.Count > 0)
                 {
                     break;
                 }
             }
 
             // If more than one player, check 2nd highest card
-            if (highCardPlayers != null && highCardPlayers.Count > 1)
+            if (highCardPlayers.Count > 1)
             {
                 for (int i = 14; i > 1; i--)
                 {
                     highCardPlayers = GetPlayersWithValue(players, i, 1);
 
-                    if (highCardPlayers != null && highCardPlayers.Count > 0)
+                    if (highCardPlayers.Count > 0)
                     {
                         break;
                     }
@@ -206,17 +236,22 @@ namespace Poker
             }
 
             // If more than one player, check 3rd highest card
-            if (highCardPlayers != null && highCardPlayers.Count > 1)
+            if (highCardPlayers.Count > 1)
             {
                 for (int i = 14; i > 1; i--)
                 {
                     highCardPlayers = GetPlayersWithValue(players, i, 2);
 
-                    if (highCardPlayers != null && highCardPlayers.Count > 0)
+                    if (highCardPlayers.Count > 0)
                     {
                         break;
                     }
                 }
+            }
+
+            if (highCardPlayers.Count > 0)
+            {
+                highCardPlayers[0].handType = EHandType.HighCard;
             }
 
             return highCardPlayers;
@@ -234,7 +269,7 @@ namespace Poker
             {
                 List<Card> SortedCards = player.cards.OrderByDescending(c => (int)c.Value).ToList();
 
-                if (SortedCards[cardIndex].Value == (EVALUE)evalueIndex)
+                if (SortedCards[cardIndex].Value == (EValue)evalueIndex)
                 {
                     valuePlayers.Add(player);
                 }
@@ -262,7 +297,7 @@ namespace Poker
             if ((int)SortedCards[0].Value + 1 == (int)SortedCards[1].Value && (int)SortedCards[1].Value + 1 == (int)SortedCards[2].Value)
                 return true;
             // If there's a 'A-2-3' run
-            else if (SortedCards[2].Value == Card.EVALUE.A && SortedCards[0].Value == Card.EVALUE.TWO && SortedCards[0].Value == Card.EVALUE.THREE)
+            else if (SortedCards[2].Value == Card.EValue.A && SortedCards[0].Value == Card.EValue.TWO && SortedCards[0].Value == Card.EValue.THREE)
                 return true;
             else
                 return false;
@@ -275,23 +310,61 @@ namespace Poker
 
             List<int> pairs = new List<int>();
 
+            int maxPair;
+
 
             foreach (Player player in players)
             {
                 pairs.Add((int)player.pair);
             }
 
-            pairs.Sort();
+            maxPair = pairs.Max();
 
             foreach (Player player in players)
             {
-                if ((int)player.pair == pairs[0])
+                if ((int)player.pair == maxPair)
                 {
                     highPairPlayers.Add(player);
                 }
             }
 
             return highPairPlayers;
+        }
+
+        // Because the pair is tied, this function will check the highest remaining card
+        private List<Player> RemainingCard(List<Player> players)
+        {
+            List<Player> remainingPlayers = new List<Player>();
+            List<int> maxIndex = new List<int>();
+            int maxCard;
+
+
+            foreach (Player player in players)
+            {
+               foreach (Card card in player.cards)
+                {
+                    if (card.Value != player.pair)
+                    {
+                        maxIndex.Add((int)card.Value);
+                    }
+                }
+            }
+
+            maxCard = maxIndex.Max();
+
+            foreach (Player player in players)
+            {
+                foreach (Card card in player.cards)
+                {
+                    if ((int)card.Value == maxCard && card.Value != player.pair)
+                    {
+                        remainingPlayers.Add(player);
+                    }
+                }
+            }
+
+            return remainingPlayers;
+
         }
 
 

@@ -43,8 +43,8 @@ namespace ConsoleApp1
                     Card card = new Card();
 
                     char[] value = cardInput[i].ToCharArray();
-                    card.Value = (EVALUE)Enum.Parse(typeof(EVALUE), value[0].ToString());
-                    card.Suit = (ESUIT)Enum.Parse(typeof(ESUIT), value[1].ToString());
+                    card.Value = (EValue)Enum.Parse(typeof(EValue), value[0].ToString());
+                    card.Suit = (ESuit)Enum.Parse(typeof(ESuit), value[1].ToString());
 
                     player.cards.Add(card);
                 }
@@ -66,10 +66,11 @@ namespace ConsoleApp1
                 winnnersId += $" {winner.Id} ";
             }
 
+            Console.WriteLine(Environment.NewLine);
 
             if (!string.IsNullOrEmpty(winnnersId) && winnnersId.Trim().Length > 1)
             {
-                Console.WriteLine($"Winners: {winnnersId}");
+                Console.WriteLine($"We have a tie! {winnnersId}");
             }
             else if (string.IsNullOrEmpty(winnnersId))
             {
@@ -79,7 +80,23 @@ namespace ConsoleApp1
             {
                 Console.WriteLine($"Winner: {winnnersId}");
             }
-            Console.Read();
+
+            if (winningPlayers.Count > 0)
+            {
+                Console.WriteLine($"Winning Hand Type: {winningPlayers[0].handType.ToString()}");
+            }
+
+
+
+            int playagain = 0;
+            if (!int.TryParse(Console.ReadLine(), out playagain))
+            {
+                if (playagain == 1)
+                    Main(null);
+                else
+                    Environment.Exit(0);
+
+            }
 
         }
     }

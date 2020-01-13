@@ -9,6 +9,7 @@ namespace Poker.Models
     {
         public int Id;
         public List<Card> cards;
-        public EVALUE pair;
+        public EValue pair;
+        public EHandType handType;
     }
 }
